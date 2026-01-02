@@ -1,8 +1,13 @@
-from flask import Flask
+from flask import Flask, request, redirect, url_for, render_template
 from data_manager import DataManager
 from models import db, Movie
 import os
+import requests
+from dotenv import load_dotenv
 
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
 app = Flask(__name__)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -15,40 +20,74 @@ db.init_app(app)
 # Create an object of your DataManager class
 data_manager = DataManager()
 
+
+def fetch_movie(title):
+    """Fetches data from API based on movie title"""
+    URL = f"http://www.omdbapi.com/?apikey={API_KEY}&t={title}"
+
+    result = {}
+    try:
+        res = requests.get(URL)
+        if res.ok:
+            result = res.json()
+        else:
+            print("Movie not found in OMDb.")
+
+    except requests.exceptions.Timeout:
+        print("Error: The request to OMDb timed out.")
+        return {}
+
+    except requests.exceptions.ConnectionError:
+        print("Error: Cannot connect to the OMDb API "
+              "(no internet or server unreachable).")
+        return {}
+
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP error: {e}")
+        return {}
+
+    return result
+
 @app.route('/')
 def home():
     """Homepage:
     Shows a list of all registered users and a form for adding new users."""
-    return "Welcome to MoviWeb App!"
+    users = data_manager.get_users()
+    return render_template('index.html', users=users)
 
-@app.route('/users', methods=['GET', 'POST'])
-def list_users():
+@app.route('/users', methods=['POST'])
+def create_user():
     """When the user submits the “add user” form, a POST request is made.
     The server receives the new user info, adds it to the database,
     then redirects back to /"""
-    users = data_manager.get_users()
-    return str(users)
+
+    name = request.form.get('name')
+    data_manager.create_user(name)
+    # Redirect, so that the form is empty again
+    return redirect(url_for('home'))
+
 
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
-def get_users_movies(user_id):
+def get_movies(user_id):
     """When you click on a username,
     the app retrieves that user’s list of favorite movies and displays it."""
     pass
 
-@app.route('users/<int:user_id>/movies', methods=['POST'])
+@app.route('/users/<int:user_id>/movies', methods=['POST'])
 def add_movie_to_user(user_id):
     """Add a new movie to a user’s list of favorite movies."""
+    #title =
+    #movie_to_add = fetch_movie(title)
 
-    pass
 
-@app.route('users/<int:user_id>/movies/<int:movie_id>/update',
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/update',
            methods=['POST'])
 def modify_movie_title(user_id, movie_id):
     """Modify the title of a specific movie in a user’s list,
     without depending on OMDb for corrections."""
     pass
 
-@app.route('users/<int:user_id>/movies/<int:movie_id>/delete',
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete',
            methods=['POST'])
 def delete_movie(user_id, movie_id):
     """Remove a specific movie from a user’s favorite movie list."""
