@@ -93,7 +93,10 @@ def add_movie(user_id):
 def update_movie(user_id, movie_id):
     """Modify the title of a specific movie in a user’s list,
     without depending on OMDb for corrections."""
-    pass
+    new_title = request.form.get('title')
+    data_manager.update_movie(movie_id, new_title)
+
+    return redirect(url_for('get_movies', user_id=user_id, movie_id=movie_id))
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete',
            methods=['POST'])

@@ -11,7 +11,11 @@
                         <img src="/static/placeholder.jpg" alt="No poster available" class="movie-poster">
                     {% endif %}
 
-
+                    <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+                          method="POST" class="inline-form">
+                        <input type="text" name="title" value="{{ movie.name }}" required>
+                        <button type="submit" class="button-small">Update</button>
+                    </form>
                     <div>
                         <strong>Year:</strong>
                         {{ movie.year }}
