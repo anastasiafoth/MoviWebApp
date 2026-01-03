@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template
 from data_manager import DataManager
-from models import db, Movie
+from models import db, Movie, User
 import os
 import requests
 from dotenv import load_dotenv
@@ -66,23 +66,31 @@ def create_user():
     # Redirect, so that the form is empty again
     return redirect(url_for('home'))
 
-
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
 def get_movies(user_id):
     """When you click on a username,
     the app retrieves that user’s list of favorite movies and displays it."""
-    pass
+    movies = data_manager.get_movies(user_id)
+    user = User.query.get(user_id)
+    return render_template('movies.html', movies=movies, user=user)
 
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
-def add_movie_to_user(user_id):
+def add_movie(user_id):
     """Add a new movie to a user’s list of favorite movies."""
-    #title =
-    #movie_to_add = fetch_movie(title)
+    title = request.form.get('title')
+    movie_to_add_dict = fetch_movie(title)
+    new_movie = Movie(name=movie_to_add_dict.get("Title"),
+                      director=movie_to_add_dict.get("Director"),
+                      year=movie_to_add_dict.get("Year"),
+                      poster_url=movie_to_add_dict.get("Poster"),
+                      user_id=user_id)
 
+    data_manager.add_movie(new_movie)
+    return redirect(url_for('get_movies', user_id=user_id))
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update',
            methods=['POST'])
-def modify_movie_title(user_id, movie_id):
+def update_movie(user_id, movie_id):
     """Modify the title of a specific movie in a user’s list,
     without depending on OMDb for corrections."""
     pass
