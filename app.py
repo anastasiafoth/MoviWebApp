@@ -102,8 +102,8 @@ def update_movie(user_id, movie_id):
            methods=['POST'])
 def delete_movie(user_id, movie_id):
     """Remove a specific movie from a user’s favorite movie list."""
-    pass
-
+    data_manager.delete_movie(movie_id)
+    return redirect(url_for('get_movies', user_id=user_id, movie_id=movie_id))
 
 if __name__ == '__main__':
   with app.app_context():

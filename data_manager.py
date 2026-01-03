@@ -34,10 +34,7 @@ class DataManager():
 
     def delete_movie(self, movie_id):
         """Delete the movie from the user’s list of favorites."""
-        movie_to_delete = Movie.query.filter(
-            Movie.id == movie_id,
-            Movie.user_id == User.id
-        )
+        movie_to_delete = Movie.query.get(movie_id)
         if not movie_to_delete:
             return False
 

@@ -24,6 +24,13 @@
                         <strong>Director:</strong>
                         {{ movie.director }}
                     </div>
+                    <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+                    method="post" class="inline-form">
+                        <button type="submit" class="delete btn"
+                                onclick="return confirm('Delete this movie?');">
+                            Delete
+                        </button>
+                    </form>
                 </div>
             {% endfor %}
         {% endif %}
