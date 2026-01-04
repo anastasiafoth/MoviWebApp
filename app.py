@@ -1,4 +1,6 @@
-from flask import Flask, request, redirect, url_for, render_template
+from os import WCONTINUED
+
+from flask import Flask, request, redirect, url_for, render_template, flash
 from data_manager import DataManager
 from models import db, Movie, User
 import os
@@ -9,6 +11,7 @@ load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 app = Flask(__name__)
+app.secret_key = 'my_secret_key_123' # needed for redirection
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'data/movies.db')}"
@@ -30,8 +33,6 @@ def fetch_movie(title):
         res = requests.get(URL)
         if res.ok:
             result = res.json()
-        else:
-            print("Movie not found in OMDb.")
 
     except requests.exceptions.Timeout:
         print("Error: The request to OMDb timed out.")
@@ -78,14 +79,37 @@ def get_movies(user_id):
 def add_movie(user_id):
     """Add a new movie to a user’s list of favorite movies."""
     title = request.form.get('title')
+    year = request.form.get('year')
+    movies = data_manager.get_movies(user_id)
+
     movie_to_add_dict = fetch_movie(title)
+
+    # Movie not found in OMDb
+    if movie_to_add_dict.get("Response") != "True":
+        flash("Movie not found in OMDb.", "error")
+        return redirect(url_for('get_movies', user_id=user_id))
+
+    # Checks if the year in user input is the year in OMDb response
+    if year:
+        if year.strip() != movie_to_add_dict.get("Year"):
+            flash("Movie with this title and release year not found in OMDb.",
+                  "error")
+            return redirect(url_for('get_movies', user_id=user_id))
+
     new_movie = Movie(name=movie_to_add_dict.get("Title"),
                       director=movie_to_add_dict.get("Director"),
                       year=movie_to_add_dict.get("Year"),
                       poster_url=movie_to_add_dict.get("Poster"),
                       user_id=user_id)
 
+    # Checks if movie already exists in collection
+    if new_movie.name in {movie.name for movie in movies}:
+        flash("Movie is already in your list.",
+              "error")
+        return redirect(url_for('get_movies', user_id=user_id))
+
     data_manager.add_movie(new_movie)
+
     return redirect(url_for('get_movies', user_id=user_id))
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update',
@@ -104,6 +128,12 @@ def delete_movie(user_id, movie_id):
     """Remove a specific movie from a user’s favorite movie list."""
     data_manager.delete_movie(movie_id)
     return redirect(url_for('get_movies', user_id=user_id, movie_id=movie_id))
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 
 if __name__ == '__main__':
   with app.app_context():
