@@ -1,0 +1,262 @@
+/* =========================================
+   Global Reset & Theme
+   ========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace; /* Monospace for a vintage feel */
+    line-height: 1.6;
+    background-color: #121212; /* Deep dark background */
+    color: #e0e0e0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+a {
+    color: #F2E8B6; /* Golden/Yellow accent */
+}
+
+h1, h2{
+    color: #F2E8B6; /* Golden/Yellow accent */
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+h3 {
+    color: #fff;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+.hero-section {
+    position: relative;
+    background-image: url('/static/background.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 0; /* Overlay liegt "hinten" */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1; /* Inhalte liegen über dem Overlay */
+    text-align: center;
+    color: white;
+}
+
+.hero-content form {
+    margin-top: 1rem; /* Optional */
+}
+
+/* =========================================
+   User List (index.html)
+   ========================================= */
+.user-list {
+    list-style: none;
+    margin-bottom: 40px;
+}
+
+.user-entry {
+    margin-bottom: 15px;
+}
+
+.user-entry .btn {
+    display: block;
+    text-align: center;
+    background-color: #333;
+    color: #F2E8B6;
+    padding: 15px;
+    text-decoration: none;
+    border: 1px solid #444;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.user-entry .btn:hover {
+    background-color: #F2E8B6;
+    color: #000;
+
+}
+
+/* =========================================
+   Film Strip Movie Cards (movies.html)
+   ========================================= */
+.card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 50px;
+    padding: 40px 0;
+}
+
+.movie_item {
+    position: relative;
+    background: #000; /* Black film strip color */
+    padding: 45px 20px; /* Space for sprocket holes at top and bottom */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sprocket Holes (The film perforations) */
+.movie_item::before,
+.movie_item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 15px;
+    /* Creates small rectangular holes */
+    background-image: linear-gradient(to right, #1a1a1a 60%, transparent 60%);
+    background-size: 20px 100%;
+    background-position: center;
+}
+
+.movie_item::before { top: 15px; }    /* Top holes */
+.movie_item::after { bottom: 15px; } /* Bottom holes */
+
+/* Scattered Photo Dump Rotation */
+.movie_item:nth-child(odd) {
+    transform: rotate(-3deg);
+}
+
+.movie_item:nth-child(even) {
+    transform: rotate(2deg);
+}
+
+.movie_item:hover {
+    transform: rotate(0deg) scale(1.08);
+    z-index: 10;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+}
+
+.movie-poster {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Square photo like your reference */
+    object-fit: cover;
+    border: 1px solid #222;
+    filter: sepia(20%) contrast(110%); /* Subtle vintage filter */
+    margin-bottom: 15px;
+}
+
+/* Forms inside Movie Card */
+.movie_item .inline-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.movie_item input[type="text"] {
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 5px;
+    font-size: 0.9rem;
+}
+
+.movie_item strong {
+    color: #F2E8B6;
+    font-size: 0.8rem;
+}
+
+/* =========================================
+   Buttons & Flash Messages
+   ========================================= */
+.button, .button-small, .btn {
+    cursor: pointer;
+    border: none;
+    border-radius: 2px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.button {
+    background-color: #F2E8B6;
+    color: #000;
+    padding: 10px 20px;
+}
+
+.button:hover {
+    background-color: #8C8665;
+    color: #fff;
+}
+
+.button-small {
+    background-color: #444;
+    color: #fff;
+    padding: 5px;
+    font-size: 0.7rem;
+
+}
+
+.button-small:hover {
+    background-color: #fff;
+    color: #444;
+}
+
+.delete.btn {
+    background-color: transparent;
+    border: 1px solid #e74c3c;
+    color: #BF0404;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    padding: 5px;
+}
+
+.delete.btn:hover {
+    background-color: #BF0404;
+    color: white;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    border-left: 5px solid;
+}
+
+.alert-success { background-color: #1e3a1e; border-color: #2ecc71; color: #d4edda; }
+.alert-error { background-color: #3a1e1e; border-color: #BF0404; color: #f8d7da; }
+
+/* =========================================
+   Footer / Form Section
+   ========================================= */
+.form-section {
+    margin-top: 60px;
+    padding: 30px;
+    border: 1px dashed #444;
+    background: #111;
+}
+
+.form-section input {
+    margin: 10px 0;
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+}

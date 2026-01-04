@@ -1,5 +1,3 @@
-from os import WCONTINUED
-
 from flask import Flask, request, redirect, url_for, render_template, flash
 from data_manager import DataManager
 from models import db, Movie, User
@@ -63,7 +61,12 @@ def create_user():
     then redirects back to /"""
 
     name = request.form.get('name')
-    data_manager.create_user(name)
+    try:
+        data_manager.create_user(name)
+    except Exception as e:
+        flash(f"Error creating user: {e}", "error")
+        return redirect(url_for('home'))
+
     # Redirect, so that the form is empty again
     return redirect(url_for('home'))
 
@@ -71,8 +74,21 @@ def create_user():
 def get_movies(user_id):
     """When you click on a username,
     the app retrieves that user’s list of favorite movies and displays it."""
-    movies = data_manager.get_movies(user_id)
-    user = User.query.get(user_id)
+    try:
+        movies = data_manager.get_movies(user_id)
+    except Exception as e:
+        flash(f"Error retrieving movies: {e}", "error")
+        return redirect(url_for('home'))
+
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            flash("User not found", "error")
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f"Database error: {e}", "error")
+        return redirect(url_for('home'))
+
     return render_template('movies.html', movies=movies, user=user)
 
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
@@ -80,7 +96,11 @@ def add_movie(user_id):
     """Add a new movie to a user’s list of favorite movies."""
     title = request.form.get('title')
     year = request.form.get('year')
-    movies = data_manager.get_movies(user_id)
+    try:
+        movies = data_manager.get_movies(user_id)
+    except Exception as e:
+        flash(f"Error retrieving movies: {e}", "error")
+        return redirect(url_for('home'))
 
     movie_to_add_dict = fetch_movie(title)
 
@@ -126,7 +146,10 @@ def update_movie(user_id, movie_id):
            methods=['POST'])
 def delete_movie(user_id, movie_id):
     """Remove a specific movie from a user’s favorite movie list."""
-    data_manager.delete_movie(movie_id)
+    try:
+        data_manager.delete_movie(movie_id)
+    except Exception as e:
+        flash(f"Error deleting movie: {e}", "error")
     return redirect(url_for('get_movies', user_id=user_id, movie_id=movie_id))
 
 
@@ -134,6 +157,9 @@ def delete_movie(user_id, movie_id):
 def page_not_found(e):
     return render_template('404.html'), 404
 
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 404
 
 if __name__ == '__main__':
   with app.app_context():
