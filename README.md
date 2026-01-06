@@ -8,7 +8,7 @@ Check out the live version of the app: [MoviWebApp Live Demo](https://ananasweb.
 
 ## 📸 Screenshot
 
-<img src="screenshots/app-screenshot-index.png" alt="MoviWebApp Screenshot" style="max-width: 100%; height: auto; width: 600px;" />
+![MoviWebApp Screenshot](screenshots/app-screenshot-index.png)
 
 ## Features
 
